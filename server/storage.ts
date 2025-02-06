@@ -1,4 +1,6 @@
 import { transactions, type Transaction, type InsertTransaction } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
   createTransaction(transaction: InsertTransaction): Promise<Transaction>;
@@ -7,45 +9,38 @@ export interface IStorage {
   updateTransactionStatus(id: number, status: string): Promise<Transaction | undefined>;
 }
 
-export class MemStorage implements IStorage {
-  private transactions: Map<number, Transaction>;
-  private currentId: number;
-
-  constructor() {
-    this.transactions = new Map();
-    this.currentId = 1;
-  }
-
+export class DatabaseStorage implements IStorage {
   async createTransaction(insertTransaction: InsertTransaction): Promise<Transaction> {
-    const id = this.currentId++;
-    const transaction: Transaction = {
-      ...insertTransaction,
-      id,
-      createdAt: new Date(),
-    };
-    this.transactions.set(id, transaction);
+    const [transaction] = await db
+      .insert(transactions)
+      .values(insertTransaction)
+      .returning();
     return transaction;
   }
 
   async getTransactions(): Promise<Transaction[]> {
-    return Array.from(this.transactions.values()).sort((a, b) => 
-      b.createdAt.getTime() - a.createdAt.getTime()
-    );
+    return await db
+      .select()
+      .from(transactions)
+      .orderBy(transactions.createdAt);
   }
 
   async getTransaction(id: number): Promise<Transaction | undefined> {
-    return this.transactions.get(id);
+    const [transaction] = await db
+      .select()
+      .from(transactions)
+      .where(eq(transactions.id, id));
+    return transaction;
   }
 
   async updateTransactionStatus(id: number, status: string): Promise<Transaction | undefined> {
-    const transaction = this.transactions.get(id);
-    if (transaction) {
-      const updatedTransaction = { ...transaction, status };
-      this.transactions.set(id, updatedTransaction);
-      return updatedTransaction;
-    }
-    return undefined;
+    const [transaction] = await db
+      .update(transactions)
+      .set({ status })
+      .where(eq(transactions.id, id))
+      .returning();
+    return transaction;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
