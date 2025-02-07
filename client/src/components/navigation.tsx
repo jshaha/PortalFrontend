@@ -11,12 +11,12 @@ export default function Navigation() {
   ];
 
   return (
-    <nav className="border-b border-border/40">
+    <nav className="border-b border-border/40 backdrop-blur-sm bg-background/95 sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link href="/">
-            <div className="font-bold text-lg bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent cursor-pointer">
-              Crypto Pay
+            <div className="font-bold text-lg bg-gradient-to-r from-primary/90 via-primary to-primary/70 bg-clip-text text-transparent cursor-pointer flex items-center gap-2">
+              Portal Pay Demo
             </div>
           </Link>
           <div className="flex gap-8">
