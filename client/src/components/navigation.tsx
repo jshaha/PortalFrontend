@@ -7,27 +7,23 @@ export default function Navigation() {
   const links = [
     { href: "/", label: "Home" },
     { href: "/payment", label: "Payment" },
-    { href: "/transactions", label: "History" },
+    { href: "/transactions", label: "Transactions" },
   ];
 
   return (
-    <nav className="border-b border-border/40 backdrop-blur-sm bg-background/95 sticky top-0 z-50">
+    <nav className="border-b">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
-          <Link href="/">
-            <div className="font-bold text-lg bg-gradient-to-r from-primary/90 via-primary to-primary/70 bg-clip-text text-transparent cursor-pointer flex items-center gap-2">
-              Portal Pay Demo
-            </div>
-          </Link>
-          <div className="flex gap-8">
+          <div className="font-bold text-primary">USDC Payments</div>
+          <div className="flex gap-6">
             {links.map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}
                 className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary relative py-1",
+                  "text-sm font-medium transition-colors hover:text-primary",
                   location === href
-                    ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary"
+                    ? "text-foreground"
                     : "text-muted-foreground"
                 )}
               >
