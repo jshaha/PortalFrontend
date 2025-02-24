@@ -1,30 +1,51 @@
-// Mock Portal API integration
-// In a real implementation, this would use the actual Portal API SDK
+import { Client } from '@portal-hq/client';
+
+// Initialize Portal client with API key
+const portalClient = new Client({
+  apiKey: import.meta.env.VITE_PORTAL_API_KEY,
+});
 
 export async function initializePortalAPI() {
-  // Mock initialization
-  console.log("Portal API initialized");
+  try {
+    // Initialize the client
+    await portalClient.initialize();
+    console.log("Portal API initialized successfully");
+  } catch (error) {
+    console.error("Failed to initialize Portal API:", error);
+    throw error;
+  }
 }
 
 export async function createUSDCTransaction(amount: number, recipient: string) {
-  // Mock USDC transaction
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        id: Math.random().toString(36).slice(2),
-        status: "pending",
-      });
-    }, 1000);
-  });
+  try {
+    // Create a new transaction using Portal's MPC API
+    const transaction = await portalClient.createTransaction({
+      amount: amount.toString(),
+      recipient,
+      asset: "USDC",
+      network: "solana",
+    });
+
+    return {
+      id: transaction.id,
+      status: transaction.status,
+    };
+  } catch (error) {
+    console.error("Failed to create transaction:", error);
+    throw error;
+  }
 }
 
 export async function getTransactionStatus(txId: string) {
-  // Mock transaction status check
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        status: Math.random() > 0.5 ? "completed" : "pending",
-      });
-    }, 500);
-  });
+  try {
+    // Get transaction status from Portal API
+    const transaction = await portalClient.getTransaction(txId);
+
+    return {
+      status: transaction.status,
+    };
+  } catch (error) {
+    console.error("Failed to get transaction status:", error);
+    throw error;
+  }
 }
