@@ -14,7 +14,7 @@ export default function Navigation() {
     <nav className="border-b">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
-          <div className="font-bold text-primary">USDC Payments</div>
+          <div className="font-bold text-primary">Portal</div>
           <div className="flex gap-6">
             {links.map(({ href, label }) => (
               <Link

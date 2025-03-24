@@ -8,10 +8,10 @@ export default function Home() {
     <div className="max-w-4xl mx-auto">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-          Crypto Payment Demo
+          Portal Wallet
         </h1>
         <p className="text-lg text-muted-foreground">
-          Experience seamless cryptocurrency transactions with customizable wallet infrastructure
+          Secure. Fast. Decentralized. Your gateway to crypto-powered finance.
         </p>
       </div>
 
