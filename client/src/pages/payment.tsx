@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
@@ -11,11 +11,15 @@ import { insertTransactionSchema, type InsertTransaction } from "@shared/schema"
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { useCryptoPriceStore } from "@/lib/crypto";
+import { wallet, transactionRequestSchema } from "@/lib/wallet";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 export default function Payment() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const prices = useCryptoPriceStore((state: { prices: Record<string, { price: number }> }) => state.prices);
+  const [walletAddress, setWalletAddress] = useState<string>("");
 
   const form = useForm<InsertTransaction>({
     resolver: zodResolver(insertTransactionSchema),
@@ -32,8 +36,36 @@ export default function Payment() {
   const selectedCrypto = form.watch("cryptocurrency");
   const currentPrice = prices[selectedCrypto]?.price || 1;
 
+  const connectWallet = async () => {
+    try {
+      const address = await wallet.connect();
+      setWalletAddress(address);
+      form.setValue("senderAddress", address);
+      toast({
+        title: "Wallet Connected",
+        description: `Connected to address: ${address.slice(0, 6)}...${address.slice(-4)}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Connection Failed",
+        description: "Failed to connect wallet. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const mutation = useMutation({
     mutationFn: async (data: InsertTransaction) => {
+      // First validate and sign the transaction with the wallet
+      const txRequest = transactionRequestSchema.parse({
+        amount: data.amount,
+        cryptocurrency: data.cryptocurrency,
+        recipientAddress: data.recipientAddress,
+      });
+
+      await wallet.signTransaction(txRequest);
+
+      // Then send to your backend
       const res = await apiRequest("POST", "/api/transactions", {
         ...data,
         priceAtTransaction: currentPrice,
@@ -58,11 +90,33 @@ export default function Payment() {
 
   return (
     <div className="max-w-md mx-auto">
-      <Card>
+      <Card className="border-none shadow-lg bg-gradient-to-br from-background/95 to-background">
         <CardHeader>
-          <CardTitle>Send Crypto Payment</CardTitle>
+          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            Send Payment
+          </CardTitle>
+          <CardDescription>
+            Send crypto payments securely and instantly
+          </CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="mb-6">
+            <Button 
+              onClick={connectWallet} 
+              variant="outline" 
+              className="w-full"
+              disabled={!!walletAddress}
+            >
+              {walletAddress ? (
+                <span className="font-mono">
+                  {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+                </span>
+              ) : (
+                "Connect Wallet"
+              )}
+            </Button>
+          </div>
+
           <Form {...form}>
             <form onSubmit={form.handleSubmit((data) => mutation.mutate(data))} className="space-y-4">
               <FormField
@@ -103,6 +157,7 @@ export default function Payment() {
                           step="any"
                           {...field}
                           onChange={(e) => field.onChange(Number(e.target.value))}
+                          className="pr-24"
                         />
                         <div className="absolute right-3 top-2 text-sm text-muted-foreground">
                           ≈ ${(field.value * currentPrice).toFixed(2)}
@@ -116,34 +171,31 @@ export default function Payment() {
 
               <FormField
                 control={form.control}
-                name="senderAddress"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Sender Address</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
                 name="recipientAddress"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Recipient Address</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} className="font-mono" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <Button type="submit" className="w-full" disabled={mutation.isPending}>
-                {mutation.isPending ? "Processing..." : `Send ${selectedCrypto}`}
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-to-r from-primary to-primary/70 hover:from-primary/90 hover:to-primary/60" 
+                disabled={mutation.isPending || !walletAddress}
+              >
+                {mutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  `Send ${selectedCrypto}`
+                )}
               </Button>
             </form>
           </Form>

@@ -8,15 +8,15 @@ export default function Home() {
     <div className="max-w-4xl mx-auto">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-          USDC Payment Demo
+          Crypto Payment Demo
         </h1>
         <p className="text-lg text-muted-foreground">
-          Experience seamless USDC transactions with Portal API integration
+          Experience seamless cryptocurrency transactions with customizable wallet infrastructure
         </p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
-        <Card>
+        <Card className="border-none shadow-lg bg-gradient-to-br from-background/95 to-background">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Coins className="h-6 w-6" />
@@ -25,10 +25,10 @@ export default function Home() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground mb-4">
-              Send USDC to any wallet address instantly and securely
+              Send any supported cryptocurrency instantly and securely
             </p>
             <Link href="/payment">
-              <Button className="w-full">
+              <Button className="w-full bg-gradient-to-r from-primary to-primary/70 hover:from-primary/90 hover:to-primary/60">
                 Start Payment
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -36,7 +36,7 @@ export default function Home() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-none shadow-lg bg-gradient-to-br from-background/95 to-background">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Coins className="h-6 w-6" />
@@ -45,7 +45,7 @@ export default function Home() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground mb-4">
-              Track and monitor all your USDC transactions
+              Track and monitor all your crypto transactions
             </p>
             <Link href="/transactions">
               <Button className="w-full" variant="outline">
