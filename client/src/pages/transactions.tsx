@@ -20,7 +20,7 @@ export default function Transactions() {
   if (isLoading) {
     return (
       <div className="max-w-4xl mx-auto">
-        <Card className="animate-pulse">
+        <Card className="animate-pulse border-none shadow-lg bg-gradient-to-br from-background/95 to-background">
           <CardHeader>
             <div className="h-8 bg-muted rounded w-1/3" />
           </CardHeader>
@@ -38,10 +38,14 @@ export default function Transactions() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <Card>
+      <Card className="border-none shadow-lg bg-gradient-to-br from-background/95 to-background">
         <CardHeader>
-          <CardTitle>Transaction History</CardTitle>
-          <CardDescription>View all your crypto transactions</CardDescription>
+          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            Transaction History
+          </CardTitle>
+          <CardDescription>
+            View all your crypto transactions
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -52,15 +56,15 @@ export default function Transactions() {
               const priceChange = ((currentPrice - priceAtTransaction) / priceAtTransaction) * 100;
 
               return (
-                <Card key={tx.id}>
+                <Card key={tx.id} className="border border-primary/10 bg-black/40 backdrop-blur-sm">
                   <CardContent className="pt-6">
                     <div className="flex justify-between items-start gap-4">
                       <div>
                         <div className="flex items-center gap-2">
-                          <p className="font-medium">
-                            {amount} {tx.cryptocurrency}
+                          <p className="font-bold text-primary">
+                            {amount.toFixed(8)} {tx.cryptocurrency}
                           </p>
-                          <Badge variant="outline">
+                          <Badge variant="outline" className="border-primary/20">
                             ${(amount * priceAtTransaction).toFixed(2)}
                           </Badge>
                         </div>
@@ -72,10 +76,10 @@ export default function Transactions() {
                             {priceChange.toFixed(2)}%)
                           </span>
                         </p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm font-mono text-muted-foreground mt-2">
                           To: {tx.recipientAddress}
                         </p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm font-mono text-muted-foreground">
                           From: {tx.senderAddress}
                         </p>
                       </div>
@@ -88,6 +92,7 @@ export default function Transactions() {
                               ? "secondary"
                               : "destructive"
                           }
+                          className="bg-gradient-to-r from-primary to-primary/70"
                         >
                           {tx.status}
                         </Badge>
